@@ -1,19 +1,75 @@
-const player1 = {
-    NOME: "Mario",
-    VELOCIDADE: 4,
-    MANOBRABILIDADE: 3,
-    PODER: 3,
-    PONTOS: 0,
-};
+const players = [
+    {
+        NOME: "Mario",
+        VELOCIDADE: 4,
+        MANOBRABILIDADE: 3,
+        PODER: 3,
+        PONTOS: 0,
+    },
+    {
+        NOME: "Luigi",
+        VELOCIDADE: 3,
+        MANOBRABILIDADE: 4,
+        PODER: 4,
+        PONTOS: 0,
+    },
+    {
+        NOME: "Bowser",
+        VELOCIDADE: 5,
+        MANOBRABILIDADE: 2,
+        PODER: 5,
+        PONTOS: 0,
+    },
+    {
+        NOME: "Peach",
+        VELOCIDADE: 3,
+        MANOBRABILIDADE: 4,
+        PODER: 2,
+        PONTOS: 0,
+    },
+    {
+        NOME: "Yoshi",
+        VELOCIDADE: 2,
+        MANOBRABILIDADE: 4,
+        PODER: 3,
+        PONTOS: 0,
+    },
+    {
+        NOME: "Donkey Kong",
+        VELOCIDADE: 2,
+        MANOBRABILIDADE: 2,
+        PODER: 5,
+        PONTOS: 0,
+    }
+]
 
-const player2 = {
-    NOME: "Luigi",
-    VELOCIDADE: 3,
-    MANOBRABILIDADE: 4,
-    PODER: 4,
-    PONTOS: 0,
-};
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
+function askQuestion(query) {
+    return new Promise(resolve => rl.question(query, resolve));
+}
+
+async function selectPlayer(playerNumber) {
+    console.log(`\n--- Selecionar Jogador ${playerNumber} ---`);
+    players.forEach((player, index) => {
+        console.log(`${index + 1}. ${player.NOME}`);
+    });
+    let chosenPlayerIndex;
+    while (true) {
+        const input = await askQuestion(`Escolha o Jogador ${playerNumber} pelo número: `);
+        chosenPlayerIndex = parseInt(input) - 1;
+
+        if (chosenPlayerIndex >= 0 && chosenPlayerIndex < players.length) {
+            return { ...players[chosenPlayerIndex], PONTOS: 0 };
+        } else {
+            console.log("Escolha inválida. Por favor, digite um número da lista.");
+        }
+    }
+}
 
 async function rollDice(){
     return Math.floor(Math.random() * 6) + 1;
@@ -121,10 +177,12 @@ async function declareWinner(character1, character2){
 }
 
 (async function main(){
+    const player1 = await selectPlayer(1);
+    const player2 = await selectPlayer(2);
     console.log(
         `🏁🚨 Corrida entre ${player1.NOME} e ${player2.NOME} começando! :D\n`
     );
     await playRaceEngine(player1, player2);
     await declareWinner(player1, player2);
+    rl.close();
 })();
-//funcao auto invoke (nao precisa chamar ela fora do corpo dela)
