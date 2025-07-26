@@ -92,6 +92,18 @@ async function getRandomBlock(){
     return result;
 }
 
+async function randomConfront(){
+    let random = Math.random();
+    let result;
+    if(random < 0.5){
+        result = "casco";
+    }
+    else{
+        result = "bomba";
+    }
+    return result;
+}
+
 async function logRollResult(characterName, block, diceResult, attribute){
     console.log(`${characterName} rolou um dado de ${block} ${diceResult} + ${attribute} = ${diceResult+attribute}`);
 }
@@ -127,26 +139,58 @@ async function playRaceEngine(character1, character2){
         if(block === "CONFRONTO"){
             let powerResult1 = diceResult1 + character1.PODER;
             let powerResult2 = diceResult2 + character2.PODER;
+            let confrontType = await randomConfront();
 
             console.log(`${character1.NOME} confrontou com ${character2.NOME}!`);
+            console.log(`O tipo de confronto é ${confrontType}!`);
 
             await logRollResult(character1.NOME, "poder", diceResult1, character1.PODER);
             await logRollResult(character2.NOME, "poder", diceResult2, character2.PODER);
             
-            if(powerResult1 > powerResult2 && character2.PONTOS > 0){
-                console.log(`${character1.NOME} venceu o confronto!`);
-                console.log(`${character2.NOME} perdeu um ponto`);
-                character2.PONTOS--;
+            if(confrontType === "casco"){
+                if(powerResult1 > powerResult2){
+                    console.log(`${character1.NOME} venceu o confronto!`);
+                    if(character2.PONTOS > 0){
+                        console.log(`${character2.NOME} perdeu um ponto`);
+                        character2.PONTOS--;
+                    }
+                    else{
+                        console.log(`${character2.NOME} não tem pontos o suficiente para perder!`);
+                    }
+                }
+                else{
+                    console.log(`${character2.NOME} venceu o confronto!`);
+                    if(character1.PONTOS > 0){
+                        console.log(`${character1.NOME} perdeu um ponto`);
+                        character1.PONTOS--;
+                    }
+                    else{
+                        console.log(`${character1.NOME} não tem pontos o suficiente para perder!`);
+                    }
+                }
             }
 
-            if(powerResult1 < powerResult2 && character1.PONTOS > 0){
-                console.log(`${character2.NOME} venceu o confronto!`);
-                console.log(`${character1.NOME} perdeu um ponto`);
-                character1.PONTOS--;
-            }
-            
-            if(powerResult1 === powerResult2){
-                console.log("Confronto empatado, nenhum ponto foi perdido");
+            if(confrontType === "bomba"){
+                if(powerResult1 > powerResult2){
+                    console.log(`${character1.NOME} venceu o confronto!`);
+                    if(character2.PONTOS > 1){
+                        console.log(`${character2.NOME} perdeu dois pontos`);
+                        character2.PONTOS = character2.PONTOS - 2;
+                    }
+                    else{
+                        console.log(`${character2.NOME} não tem pontos o suficiente para perder!`);
+                    }
+                }
+                else{
+                    console.log(`${character2.NOME} venceu o confronto!`);
+                    if(character1.PONTOS > 1){
+                        console.log(`${character1.NOME} perdeu dois pontos`);
+                        character1.PONTOS = character1.PONTOS - 2;
+                    }
+                    else{
+                        console.log(`${character1.NOME} não tem pontos o suficiente para perder!`);
+                    }
+                }
             }
         }
 
@@ -186,3 +230,7 @@ async function declareWinner(character1, character2){
     await declareWinner(player1, player2);
     rl.close();
 })();
+
+/*confroto
+sortear aleatoriamente se é um casco(-1 ponto) ou um bomba(-2 pontos)
+quem vence o confronto ganha um turbo (+ 1ponto) aleatoriamente*/
